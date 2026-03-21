@@ -8,8 +8,8 @@ Interactive physics simulator (French UI) demonstrating the Rayleigh Criterion. 
 
 ## 💡 Why this project?
 
-To be completely honest, I created this simulator because I was racking my brain trying to understand the abstract theory behind the Rayleigh Criterion. Learning solely with static formulas on paper just wasn't doing it for me; I needed to build a modern, interactive, and visual tool to make the concept truly "click" in my head.
+To be completely honest, I created this simulator because I was racking my brain trying to understand the abstract theory behind the Rayleigh Criterion. Learning solely with static formulas on paper just wasn't doing it for me. So I needed to build a modern, interactive, and visual tool to make the concept truly "click" in my head.
 
-Since developing this tool helped me tremendously in mastering the concepts of optical resolution and diffraction, I decided to make it *open source* and accessible to everyone. 
+Since developing this tool helped me tremendously in understanding the concepts of optical resolution and diffraction, I decided to make it accessible to everyone. 
 
 I hope this simulator will be useful to all students, curious minds, and physics enthusiasts who, like me, need to "see" science in action to truly understand it!
