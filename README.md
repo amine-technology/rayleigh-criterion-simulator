@@ -12,4 +12,4 @@ To be completely honest, I created this simulator because I was racking my brain
 
 Since developing this tool helped me tremendously in understanding the concepts of optical resolution and diffraction, I decided to make it accessible to everyone. 
 
-I hope this simulator will be useful to all students, curious minds, and physics enthusiasts who, like me, need to "see" science in action to truly understand it!
+I hope this simulator will be useful to all students, curious minds, and physics enthusiasts who sometimes, like me, need to "see" science in action to truly understand it!
