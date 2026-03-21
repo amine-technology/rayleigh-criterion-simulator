@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulateur : Critère de Rayleigh</title>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .controls {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sliders { flex-grow: 1; margin-right: 20px; }
+        label { display: block; margin: 10px 0; font-size: 0.9em; color: #cbd5e1; }
+        input[type="range"] { width: 100%; cursor: pointer; }
+        #status { 
+            font-size: 1.8em; 
+            font-weight: bold; 
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.3);
+        }
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 90%;
+            max-width: 700px;
+        }
+        .view-box {
+            position: relative;
+        }
+        .view-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.6);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        canvas {
+            background: #000;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            width: 100%;
+            display: block;
+        }
+        
+        /* --- NOUVEAU : Styles pour la boîte d'équation --- */
+        .equation-box {
+            background: #1e293b;
+            padding: 20px 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 640px;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .equation-box h3 {
+            margin-top: 0;
+            color: #38bdf8;
+            font-size: 1.2em;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+        }
+        .formula-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-family: 'Times New Roman', Times, serif;
+            margin: 20px 0;
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+        .fraction {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-left: 10px;
+        }
+        .numerator {
+            border-bottom: 2px solid #f8fafc;
+            padding: 0 8px;
+        }
+        .denominator {
+            padding: 0 8px;
+        }
+        .parameters {
+            list-style-type: none;
+            padding: 0;
+            color: #cbd5e1;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        .parameters li {
+            margin-bottom: 10px;
+            background: rgba(255,255,255,0.03);
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #38bdf8;
+        }
+        .parameters strong {
+            color: #f8fafc;
+            font-size: 1.1em;
+        }
+        /* ------------------------------------------------- */
+
+        .footer {
+            margin-top: 25px;
+            font-size: 0.9em;
+            color: #64748b;
+            letter-spacing: 0.5px;
+            padding-bottom: 30px;
+        }
+        .footer span {
+            color: #38bdf8;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Simulateur : Critère de Rayleigh</h2>
+    
+    <div class="controls">
+        <div class="sliders">
+            <label>Longueur d'onde (λ): <span id="lambdaVal" style="color:#fff; font-weight:bold;">500</span> nm
+                <input type="range" id="lambda" min="400" max="700" value="500">
+            </label>
+            <label>Diamètre de l'ouverture (D): <span id="dVal" style="color:#fff; font-weight:bold;">50</span> mm
+                <input type="range" id="D" min="10" max="100" value="50">
+            </label>
+        </div>
+        <div id="status">RÉSOLU</div>
+    </div>
+
+    <div class="canvas-container">
+        <div class="view-box">
+            <div class="view-label">Vue Géométrique (Côté)</div>
+            <canvas id="geoCanvas" width="700" height="250"></canvas>
+        </div>
+        
+        <div class="view-box">
+            <div class="view-label">Vue de l'Écran (Face)</div>
+            <canvas id="screenCanvas" width="700" height="250"></canvas>
+        </div>
+    </div>
+
+    <div class="equation-box">
+        <h3>L'équation fondamentale</h3>
+        <div class="formula-container">
+            <span>sin(θ<sub>R</sub>) = </span>
+            <div class="fraction">
+                <span class="numerator">1,22 &times; λ</span>
+                <span class="denominator">D</span>
+            </div>
+        </div>
+        <ul class="parameters">
+            <li><strong>θ<sub>R</sub></strong> (Thêta) : L'angle de résolution minimum. C'est le plus petit angle visuel permettant de distinguer deux sources distinctes avant que la diffraction ne les fusionne.</li>
+            <li><strong>λ</strong> (Lambda) : La longueur d'onde de la lumière (en mètres dans la vraie formule). Plus elle est courte, plus le faisceau est fin et meilleure est la résolution.</li>
+            <li><strong>D</strong> : Le diamètre de l'ouverture circulaire (télescope, objectif, pupille). Une grande ouverture diminue la diffraction et permet de séparer des objets plus collés.</li>
+            <li><strong>1,22</strong> : Une constante physique dérivée de la fonction de Bessel, spécifique à la géométrie des ouvertures circulaires.</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        Github: <span>Amine-Engineer</span>
+    </div>
+
+    <script>
+        const geoCanvas = document.getElementById('geoCanvas');
+        const ctxGeo = geoCanvas.getContext('2d');
+        const screenCanvas = document.getElementById('screenCanvas');
+        const ctxScreen = screenCanvas.getContext('2d');
+        
+        const inputLambda = document.getElementById('lambda');
+        const inputD = document.getElementById('D');
+        const statusText = document.getElementById('status');
+
+        function drawSimulation() {
+            const lambda = parseInt(inputLambda.value);
+            const D = parseInt(inputD.value);
+            
+            document.getElementById('lambdaVal').innerText = lambda;
+            document.getElementById('dVal').innerText = D;
+
+            // --- CALCULS PHYSIQUES DE BASE ---
+            const separationEtoiles = 60; 
+            const rayonAiry = (1.22 * lambda) / D * 4; 
+            
+            const estResolu = separationEtoiles > rayonAiry;
+            statusText.innerText = estResolu ? "RÉSOLU" : "FUSIONNÉ";
+            statusText.style.color = estResolu ? "#4ade80" : "#ef4444";
+
+            const hue = 270 - ((lambda - 400) * 0.9);
+            const colorBeam = `hsla(${hue}, 100%, 60%, 0.15)`;
+
+            // --- 1. DESSIN DE LA VUE GÉOMÉTRIQUE (Haut) ---
+            ctxGeo.clearRect(0, 0, geoCanvas.width, geoCanvas.height);
+            const centreX = geoCanvas.width / 2;
+            const centerY = geoCanvas.height / 2;
+            
+            const ySource1 = centerY - 30;
+            const ySource2 = centerY + 30;
+            const yCible1 = centerY + (separationEtoiles/2);
+            const yCible2 = centerY - (separationEtoiles/2);
+
+            ctxGeo.globalCompositeOperation = "screen";
+
+            function drawBeam(startX, startY, targetY) {
+                ctxGeo.beginPath();
+                ctxGeo.moveTo(centreX, centerY); 
+                ctxGeo.lineTo(geoCanvas.width - 5, targetY - rayonAiry); 
+                ctxGeo.lineTo(geoCanvas.width - 5, targetY + rayonAiry);
+                ctxGeo.fillStyle = colorBeam;
+                ctxGeo.fill();
+                
+                ctxGeo.beginPath();
+                ctxGeo.moveTo(10, startY);
+                ctxGeo.lineTo(centreX, centerY);
+                ctxGeo.lineTo(geoCanvas.width - 5, targetY);
+                ctxGeo.strokeStyle = `hsla(${hue}, 100%, 80%, 0.8)`;
+                ctxGeo.lineWidth = 1;
+                ctxGeo.stroke();
+            }
+
+            drawBeam(10, ySource1, yCible1);
+            drawBeam(10, ySource2, yCible2);
+
+            ctxGeo.globalCompositeOperation = "source-over";
+            ctxGeo.beginPath();
+            ctxGeo.ellipse(centreX, centerY, 8, D * 1.2, 0, 0, Math.PI * 2);
+            ctxGeo.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            ctxGeo.strokeStyle = '#fff';
+            ctxGeo.lineWidth = 2;
+            ctxGeo.fill();
+            ctxGeo.stroke();
+
+            ctxGeo.beginPath();
+            ctxGeo.moveTo(geoCanvas.width - 4, 0);
+            ctxGeo.lineTo(geoCanvas.width - 4, geoCanvas.height);
+            ctxGeo.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctxGeo.lineWidth = 4;
+            ctxGeo.stroke();
+
+            ctxGeo.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctxGeo.font = 'bold 12px Arial';
+            ctxGeo.fillText("ÉCRAN", geoCanvas.width - 55, 20);
+
+            // --- 2. DESSIN DE LA VUE ÉCRAN (Bas) ---
+            ctxScreen.clearRect(0, 0, screenCanvas.width, screenCanvas.height);
+            ctxScreen.globalCompositeOperation = "screen";
+            
+            function dessinerTacheAiry(x, y, r) {
+                const gradient = ctxScreen.createRadialGradient(x, y, 0, x, y, r);
+                gradient.addColorStop(0, `hsla(${hue}, 100%, 80%, 1)`);
+                gradient.addColorStop(0.15, `hsla(${hue}, 100%, 50%, 0.8)`);
+                gradient.addColorStop(1, `hsla(${hue}, 100%, 10%, 0)`);
+                
+                ctxScreen.beginPath();
+                ctxScreen.arc(x, y, r, 0, Math.PI * 2);
+                ctxScreen.fillStyle = gradient;
+                ctxScreen.fill();
+            }
+
+            const centreEcranX = screenCanvas.width / 2;
+            const centreEcranY = screenCanvas.height / 2;
+
+            dessinerTacheAiry(centreEcranX - (separationEtoiles / 2), centreEcranY, rayonAiry * 1.5);
+            dessinerTacheAiry(centreEcranX + (separationEtoiles / 2), centreEcranY, rayonAiry * 1.5);
+        }
+
+        inputLambda.addEventListener('input', drawSimulation);
+        inputD.addEventListener('input', drawSimulation);
+        drawSimulation(); 
+    </script>
+</body>
+</html>
