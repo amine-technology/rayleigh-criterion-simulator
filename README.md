@@ -2,7 +2,7 @@
 
 Interactive physics simulator (French UI) demonstrating the Rayleigh Criterion. Adjust wavelength (λ) and aperture diameter (D) to visualize optical resolution limits and diffraction in real-time. Vibe coded with Gemini 3.1.
 
-🚀 **[Launch the live simulator here / Lancer le simulateur en direct içi](https://amine-engineer.github.io/rayleigh-criterion-simulator/)**
+🚀 **[Launch the live simulator here / Lancer le simulateur en direct içi](https://amine-technology.github.io/rayleigh-criterion-simulator/)**
 
 ---
 
